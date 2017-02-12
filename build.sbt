@@ -40,7 +40,8 @@ lazy val chirpImpl = project("chirp-impl")
     libraryDependencies ++= Seq(
       lagomJavadslPersistenceJdbc,
       lagomJavadslPubSub,
-      lagomJavadslTestKit
+      lagomJavadslTestKit,
+      "org.postgresql" % "postgresql" % "9.4.1212"
     )
   )
   .settings(lagomForkedTestSettings: _*)
