@@ -17,7 +17,7 @@ lazy val friendImpl = project("friend-impl")
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      lagomJavadslPersistenceCassandra,
+      lagomJavadslPersistenceJdbc,
       lagomJavadslTestKit
     )
   )
@@ -98,8 +98,8 @@ lazy val jacksonParameterNamesJavacSettings = Seq(
   javacOptions in compile += "-parameters"
 )
 
-// do not delete database files on start
-lagomCassandraCleanOnStart in ThisBuild := false
+// Using jdbc based persistent entities so don't need Cassandra in dev env
+lagomCassandraEnabled in ThisBuild := false
 
 // Kafka can be disabled until we need it
 lagomKafkaEnabled in ThisBuild := false

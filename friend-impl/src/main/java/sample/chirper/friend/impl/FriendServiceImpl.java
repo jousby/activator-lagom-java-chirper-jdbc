@@ -3,13 +3,13 @@
  */
 package sample.chirper.friend.impl;
 
-import java.util.List;
-import java.util.concurrent.CompletionStage;
-import java.util.stream.Collectors;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.inject.Inject;
 
 import com.lightbend.lagom.javadsl.persistence.ReadSide;
+import com.lightbend.lagom.javadsl.persistence.jdbc.JdbcSession;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 
@@ -17,7 +17,6 @@ import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.lightbend.lagom.javadsl.api.transport.NotFound;
 import com.lightbend.lagom.javadsl.persistence.PersistentEntityRef;
 import com.lightbend.lagom.javadsl.persistence.PersistentEntityRegistry;
-import com.lightbend.lagom.javadsl.persistence.cassandra.CassandraSession;
 
 import akka.NotUsed;
 import sample.chirper.friend.api.FriendId;
@@ -30,13 +29,13 @@ import sample.chirper.friend.impl.FriendCommand.GetUser;
 public class FriendServiceImpl implements FriendService {
 
   private final PersistentEntityRegistry persistentEntities;
-  private final CassandraSession db;
+  private final JdbcSession jdbcSession;
 
   @Inject
   public FriendServiceImpl(PersistentEntityRegistry persistentEntities, ReadSide readSide,
-      CassandraSession db) {
+      JdbcSession jdbcSession) {
     this.persistentEntities = persistentEntities;
-    this.db = db;
+    this.jdbcSession = jdbcSession;
 
     persistentEntities.register(FriendEntity.class);
     readSide.register(FriendEventProcessor.class);
@@ -73,12 +72,22 @@ public class FriendServiceImpl implements FriendService {
   @Override
   public ServiceCall<NotUsed, PSequence<String>> getFollowers(String userId) {
     return req -> {
-      CompletionStage<PSequence<String>> result = db.selectAll("SELECT * FROM follower WHERE userId = ?", userId)
-        .thenApply(rows -> {
-        List<String> followers = rows.stream().map(row -> row.getString("followedBy")).collect(Collectors.toList());
-        return TreePVector.from(followers);
+      return jdbcSession.withConnection(connection -> {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM follower WHERE userId = ?")) {
+          ps.setString(1, userId);
+          try (ResultSet rs = ps.executeQuery()) {
+            PSequence<String> followers = TreePVector.empty();
+
+            while (rs.next()) {
+              followers = followers.plus(
+                  rs.getString("followedBy")
+              );
+            }
+
+            return followers;
+          }
+        }
       });
-      return result;
     };
   }
 
