@@ -18,6 +18,9 @@ import sample.chirper.chirp.api.LiveChirpsRequest;
 import sample.chirper.friend.api.FriendService;
 
 import akka.stream.javadsl.Source;
+import scala.reflect.internal.Names;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class ActivityStreamServiceImpl implements ActivityStreamService {
 
@@ -57,4 +60,8 @@ public class ActivityStreamServiceImpl implements ActivityStreamService {
       });
   }
 
+  @Override
+  public ServiceCall<NotUsed, String> health() {
+    return req -> completedFuture("OK");
+  }
 }

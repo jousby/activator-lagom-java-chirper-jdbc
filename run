@@ -1,0 +1,3 @@
+docker-compose up -d && \
+docker-compose scale consul=3 && \
+docker-compose logs -f

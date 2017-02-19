@@ -26,6 +26,8 @@ import sample.chirper.friend.impl.FriendCommand.AddFriend;
 import sample.chirper.friend.impl.FriendCommand.CreateUser;
 import sample.chirper.friend.impl.FriendCommand.GetUser;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 public class FriendServiceImpl implements FriendService {
 
   private final PersistentEntityRegistry persistentEntities;
@@ -89,6 +91,11 @@ public class FriendServiceImpl implements FriendService {
         }
       });
     };
+  }
+
+  @Override
+  public ServiceCall<NotUsed, String> health() {
+    return req -> completedFuture("OK");
   }
 
   private PersistentEntityRef<FriendCommand> friendEntityRef(String userId) {

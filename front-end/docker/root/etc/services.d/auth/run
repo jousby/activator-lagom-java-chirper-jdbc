@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+cd /opt/docker
+
+bin/front-end -Dplay.crypto.secret="asdfasdfasdfasdf"

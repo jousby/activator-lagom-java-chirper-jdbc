@@ -20,4 +20,7 @@ public class Application extends Controller {
     return ok(views.html.circuitbreaker.render());
   }
 
+  public Result health() {
+    return ok();
+  }
 }

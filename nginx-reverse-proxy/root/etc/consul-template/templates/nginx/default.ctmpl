@@ -1,0 +1,99 @@
+{{if service "front-end"}}
+upstream front-end {
+  least_conn;
+  {{range service "front-end"}}
+  server {{.Address}}:{{.Port}};
+  {{end}}
+}
+{{end}}
+
+{{if service "activity-stream"}}
+upstream activity-stream {
+  least_conn;
+  {{range service "activity-stream"}}
+  server {{.Address}}:{{.Port}};
+  {{end}}
+}
+{{end}}
+
+{{if service "chirp"}}
+upstream chirp {
+  least_conn;
+  {{range service "chirp"}}
+  server {{.Address}}:{{.Port}};
+  {{end}}
+}
+{{end}}
+
+{{if service "friend"}}
+upstream friend {
+  least_conn;
+  {{range service "friend"}}
+  server {{.Address}}:{{.Port}};
+  {{end}}
+}
+{{end}}
+
+server {
+    listen 80;
+    server_name "";
+
+    gzip on;
+    gzip_proxied any;
+    gzip_types text/plain text/xml text/css application/x-javascript;
+    gzip_vary on;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+    location /ping {
+        return 200;
+        access_log off;
+    }
+
+    {{if service "activity-stream"}}
+    location /api/activity {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+
+        proxy_pass http://activity-stream;
+        proxy_redirect off;
+    }
+    {{end}}
+
+    {{if service "chirp"}}
+    location /api/chirps {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+
+        proxy_pass http://chirp;
+        proxy_redirect off;
+    }
+    {{end}}
+
+    {{if service "friend"}}
+    location /api/users {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+
+        proxy_pass http://friend;
+        proxy_redirect off;
+    }
+    {{end}}
+
+    {{if service "front-end"}}
+    location / {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+
+        proxy_pass http://front-end;
+        proxy_redirect off;
+    }
+    {{end}}
+}

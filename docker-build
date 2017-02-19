@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Run docker image build
+cd $PROJECT_DIR
+sbt docker:publishLocal
+
+# Run docker image build on nginx reverse proxy project
+cd $PROJECT_DIR/nginx-reverse-proxy
+./build

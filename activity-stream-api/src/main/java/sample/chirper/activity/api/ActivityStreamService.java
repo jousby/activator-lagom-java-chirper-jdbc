@@ -19,12 +19,15 @@ public interface ActivityStreamService extends Service {
 
   ServiceCall<NotUsed, Source<Chirp, ?>> getHistoricalActivityStream(String userId);
 
+  ServiceCall<NotUsed, String> health();
+
   @Override
   default Descriptor descriptor() {
     // @formatter:off
     return named("activityservice").withCalls(
         pathCall("/api/activity/:userId/live", this::getLiveActivityStream),
-        pathCall("/api/activity/:userId/history", this::getHistoricalActivityStream)
+        pathCall("/api/activity/:userId/history", this::getHistoricalActivityStream),
+        namedCall("/api/activity/health", this::health)
       ).withAutoAcl(true);
     // @formatter:on
   }

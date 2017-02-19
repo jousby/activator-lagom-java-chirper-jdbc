@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 public class ChirpServiceImpl implements ChirpService {
     private final PersistentEntityRegistry persistentEntities;
     private final ChirpTopic topic;
@@ -70,7 +72,13 @@ public class ChirpServiceImpl implements ChirpService {
             PSequence<String> userIds = req.userIds;
             long timestamp = req.fromTime.toEpochMilli();
             Source<Chirp, ?> result = chirps.getHistoricalChirps(userIds, timestamp);
-            return CompletableFuture.completedFuture(result);
+            return completedFuture(result);
         };
+    }
+
+
+    @Override
+    public ServiceCall<NotUsed, String> health() {
+        return req -> completedFuture("OK");
     }
 }

@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+    consul:
+        image: smebberson/alpine-consul:3.1.0
+
+    consul-ui:
+        image: smebberson/alpine-consul-ui:2.1.0
+        ports:
+            - 8500:8500
+
+    reverse-proxy:
+        image: reverse-proxy-consul-nginx
+        ports:
+            - 80:80
+
+    chirp:
+        image: chirp-impl:1.0-SNAPSHOT
+
+    friend:
+        image: friend-impl:1.0-SNAPSHOT
+
+    activity-stream:
+        image: activity-stream-impl:1.0-SNAPSHOT
+
+    front-end:
+        image: front-end:1.0-SNAPSHOT
+

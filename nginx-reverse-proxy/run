@@ -1,0 +1,1 @@
+docker run --rm --name reverse-proxy-consul-nginx reverse-proxy-consul-nginx

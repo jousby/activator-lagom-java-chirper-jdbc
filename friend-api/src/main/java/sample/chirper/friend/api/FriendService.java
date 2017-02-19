@@ -49,6 +49,8 @@ public interface FriendService extends Service {
    */
   ServiceCall<NotUsed, PSequence<String>> getFollowers(String userId);
 
+  ServiceCall<NotUsed, String> health();
+
   @Override
   default Descriptor descriptor() {
     // @formatter:off
@@ -56,7 +58,8 @@ public interface FriendService extends Service {
         pathCall("/api/users/:userId", this::getUser),
         namedCall("/api/users", this::createUser),
         pathCall("/api/users/:userId/friends", this::addFriend),
-        pathCall("/api/users/:userId/followers", this::getFollowers)
+        pathCall("/api/users/:userId/followers", this::getFollowers),
+        namedCall("/api/users/health", this::health)
       ).withAutoAcl(true);
     // @formatter:on
   }

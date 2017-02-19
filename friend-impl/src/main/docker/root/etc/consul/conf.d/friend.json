@@ -1,0 +1,12 @@
+{
+  "service": {
+    "name": "friend",
+    "port": 51857,
+    "checks": [
+      {
+        "script": "curl -s -o /dev/null localhost:51857/health 2>&1",
+        "interval": "5s"
+      }
+    ]
+  }
+}
